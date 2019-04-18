@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import traceback
 
@@ -37,17 +38,22 @@ class Repository:
         # TODO: write more tests for this method
         try:
             stats = self.__db.command('collstats', 'news')
-            if limit < 1 or limit > stats.count:
+            if limit < 1 or limit > stats['count']:
                 # TODO: raise proper exception for limit
                 raise Exception
-            if offset < 0 or offset + limit > stats.count:
+            if offset < 0 or offset + limit > stats['count']:
                 # TODO: raise proper exception for offset
                 raise Exception
             output = []
             sort=[(sort_key, pymongo.DESCENDING if sort_desc else pymongo.ASCENDING)]
             cursor = self.__collection.find(skip=offset, limit=limit, sort=sort)
-            for item in cursor:
-                output.append(item)
+            for n, item in enumerate(cursor):
+                output.append({
+                    "id": n+1,
+                    "title": item['title'],
+                    "url": item['url'],
+                    "created": datetime.utcfromtimestamp(item['created']).isoformat()
+                })
             return output
         except:
             print(traceback.format_exc())
