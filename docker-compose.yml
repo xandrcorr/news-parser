@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  news-repository:
+    image: "mongo:3"
+    ports:
+      - 27017:27017
