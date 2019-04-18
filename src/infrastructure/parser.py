@@ -1,4 +1,4 @@
-from datetime import datetime
+import time
 
 from bs4 import BeautifulSoup
 
@@ -12,7 +12,7 @@ class Parser:
             news_elem = {
                 "title": news.text,
                 "url": news.attrs['href'],
-                "created": datetime.utcnow().isoformat()  
+                "created": time.time()
             }
             results.append(news_elem)
         return results
