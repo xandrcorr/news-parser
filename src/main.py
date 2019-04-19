@@ -4,10 +4,12 @@ import asyncio
 import traceback
 from datetime import datetime
 import json
+import os
 
 from infrastructure.parser import Parser
 from infrastructure.repository import Repository
 
+update_timeout = int(os.environ.get('POST_UPDATE_TIMEOUT', "3600"))
 routes = web.RouteTableDef()
 repo = Repository()
 
@@ -58,7 +60,7 @@ async def main():
             t = datetime.utcnow().isoformat()
             print("[{0}] Added {1} news".format(t, added))
         # check for a new articles every 1 hour
-        await asyncio.sleep(3600)
+        await asyncio.sleep(update_timeout)
 
 
 if __name__ == "__main__":
