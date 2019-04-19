@@ -3,6 +3,7 @@ from aiohttp import web
 import asyncio
 import traceback
 from datetime import datetime
+import json
 
 from infrastructure.parser import Parser
 from infrastructure.repository import Repository
@@ -28,15 +29,21 @@ async def posts_handler(request):
             offset = int(query_dict.get('offset', "0"))
             sort = query_dict.get('order', "created_desc")
             sort_key, sort_order = tuple(i for i in sort.split('_'))
-            output = repo.get(limit=limit, 
-                            offset=offset, 
-                            sort_key=sort_key, 
-                            sort_order=sort_order)
+            output = await fetch_from_db(limit=limit,
+                                         offset=offset,
+                                         sort_key=sort_key,
+                                         sort_order=sort_order)
         except:
             print(traceback.format_exc())
             # TODO: return error reason
             return web.Response(text="Bad request", status=400)
-    return web.Response(text=str(output), status=200)
+    return web.Response(text=json.dumps(output, indent=2), status=200)
+
+async def fetch_from_db(limit, offset, sort_key, sort_order):
+    return repo.get(limit=limit, 
+                    offset=offset, 
+                    sort_key=sort_key, 
+                    sort_order=sort_order)
 
 async def fetch(session, url):
     async with session.get(url) as response:
