@@ -4,6 +4,7 @@ import traceback
 
 import pymongo
 
+
 class Repository:
     def __init__(self, host=None, port=None):
         host = host or os.environ.get("REPOSITORY_HOST", "localhost")
@@ -20,7 +21,7 @@ class Repository:
             self.__collection.insert_one(item)
         except pymongo.errors.DuplicateKeyError:
             # TODO: add logger
-            print("Failed to add duplicate key")
+            # print("Failed to add duplicate key")
             raise
 
     def add_many(self, items):
@@ -47,9 +48,10 @@ class Repository:
             output = []
             sort=[(sort_key, pymongo.DESCENDING if sort_desc else pymongo.ASCENDING)]
             cursor = self.__collection.find(skip=offset, limit=limit, sort=sort)
-            for n, item in enumerate(cursor):
+            # TODO: return unique id (for potential passing to posts/{id})
+            for item in cursor:
                 output.append({
-                    "id": n+1,
+                    "id": str(item['_id']),
                     "title": item['title'],
                     "url": item['url'],
                     "created": datetime.utcfromtimestamp(item['created']).isoformat()
