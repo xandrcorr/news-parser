@@ -2,7 +2,7 @@ version: '3'
 
 services:
   hackernews-parser:
-    image: home/parser:latest
+    image: xandrcorr/hackernews-parser:latest
     environment:
       - REPOSITORY_HOST=mongo-repository
     ports:
