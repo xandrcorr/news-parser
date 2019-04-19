@@ -22,20 +22,20 @@ async def posts_handler(request):
     else:
         try:
             query_dict = { query.split('=')[0]: query.split('=')[1] 
-                        for query in request.query_string.split('&') 
-                        }
-            # TODO: handle in more pretty way if possible, especially sort direction
+                           for query in request.query_string.split('&') 
+                         }
             limit = int(query_dict.get('limit', "5"))
             offset = int(query_dict.get('offset', "0"))
-            sort_key = query_dict.get('order', "created")
-            sort_desc = query_dict.get('direction', "desc") == "desc"
+            sort = query_dict.get('order', "created_desc")
+            sort_key, sort_order = tuple(i for i in sort.split('_'))
             output = repo.get(limit=limit, 
                             offset=offset, 
                             sort_key=sort_key, 
-                            sort_desc=sort_desc)
+                            sort_order=sort_order)
         except:
             print(traceback.format_exc())
-            return web.Response(status=400)
+            # TODO: return error reason
+            return web.Response(text="Bad request", status=400)
     return web.Response(text=str(output), status=200)
 
 async def fetch(session, url):

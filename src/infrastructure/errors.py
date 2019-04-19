@@ -1,0 +1,2 @@
+class BadArgumentError(ValueError):
+    pass
