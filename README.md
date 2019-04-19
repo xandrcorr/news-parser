@@ -11,6 +11,8 @@ http://localhost:8080/posts?[params]
     - ключ - поле, по которому происходит сортировка [title, url, created]
     - порядок - порядок сортировки [asc, desc]
 
+Пример:
+http://localhost:8080/posts?limit=30&offset=5&order=created_desc
 
 Модули:
 - [x] http-client - выполняет запрос к сайту и возвращает страницу news
