@@ -1,7 +1,16 @@
 version: '3'
 
 services:
-  news-repository:
+  hackernews-parser:
+    image: home/parser:latest
+    environment:
+      - REPOSITORY_HOST=mongo-repository
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo-repository
+
+  mongo-repository:
     image: "mongo:3"
     ports:
       - 27017:27017
