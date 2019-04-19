@@ -4,7 +4,7 @@ import traceback
 
 import pymongo
 
-from .errors import BadArgumentError
+from infrastructure.errors import BadArgumentError
 
 class Repository:
     def __init__(self, host=None, port=None):
@@ -17,6 +17,7 @@ class Repository:
         # creating unique index for url field to avoid duplicate news
         self.__collection.create_index('url', unique=True)
         self.__sort_order = ['asc', 'desc']
+        self.__sort_keys = ['title', 'url', 'created']
 
     def add(self, item: dict):
         try:
@@ -47,7 +48,7 @@ class Repository:
             if offset < 0 or offset + limit > stats['count']:
                 # TODO: raise proper exception for offset
                 raise BadArgumentError
-            if sort_order in self.__sort_order:
+            if sort_order in self.__sort_order and sort_key in self.__sort_keys:
                 sort=[(sort_key, pymongo.DESCENDING if sort_order=="desc" else pymongo.ASCENDING)]
             else:
                 # TODO: raise proper exception for sort
