@@ -4,8 +4,10 @@ from bs4 import BeautifulSoup
 
 class Parser:
     @staticmethod
-    def parse_news(raw_html) -> []:
+    def parse_news(raw_html: str) -> []:
         parsed_html = BeautifulSoup(raw_html, features="html.parser")
+        if not parsed_html.body:
+            raise ValueError("Can't parse empty body.")
         news_list = parsed_html.body.find_all('a', attrs={'class': 'storylink'})
         results = []
         for news in news_list:

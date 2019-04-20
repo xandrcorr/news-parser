@@ -12,7 +12,6 @@ from infrastructure.errors import BadArgumentError
 class TestRepository(unittest.TestCase):
 
     def setUp(self):
-
         with open('resources/example.html', 'r') as f_in:
             html = f_in.read()
         self.repo = Repository(database="test_db")
@@ -30,7 +29,7 @@ class TestRepository(unittest.TestCase):
 
     def test_get(self):
         # Assuming that database if filled at least once
-        self.assertEquals(len(self.repo.get()), 5)
+        self.assertEqual(len(self.repo.get()), 5)
         self.assertEqual(len(self.repo.get(limit=20)), 20)
         self.assertEqual(len(self.repo.get(limit=20, offset=5)), 20)
         with self.assertRaises(BadArgumentError):
@@ -44,6 +43,17 @@ class TestRepository(unittest.TestCase):
 
     def tearDown(self):
         self.repo.clean_db()
+
+
+class TestParser(unittest.TestCase):
+
+    def test_parsing(self):
+        with open('resources/example.html', 'r') as f_in:
+            html = f_in.read()
+        self.assertEqual(len(Parser.parse_news(html)), 30)
+        with self.assertRaises(ValueError):
+            Parser.parse_news('')
+
 
 if __name__ == "__main__":
     # Supressing log messages
