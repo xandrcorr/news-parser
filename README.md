@@ -40,7 +40,7 @@ $ chmod +x ./venv-init.sh
 $ ./venv-init.sh
 ```
 ```
-$ source ./venv
+$ source ./venv/bin/activate
 ```
 3. Установить зависимости
 ```
