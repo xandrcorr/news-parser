@@ -1,5 +1,6 @@
 import unittest
 import time
+import logging
 
 from pymongo.errors import DuplicateKeyError
 
@@ -45,4 +46,6 @@ class TestRepository(unittest.TestCase):
         self.repo.clean_db()
 
 if __name__ == "__main__":
+    # Supressing log messages
+    logging.disable(logging.ERROR)
     unittest.main()
