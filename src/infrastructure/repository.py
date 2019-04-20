@@ -4,30 +4,33 @@ import traceback
 
 import pymongo
 
+from infrastructure import LoggerFactory
 from infrastructure.errors import BadArgumentError
 
 class Repository:
-    def __init__(self, host=None, port=None):
+    def __init__(self, host=None, port=None, database=None):
         host = host or os.environ.get("REPOSITORY_HOST", "localhost")
         port = port or int(os.environ.get("REPOSITORY_PORT", "27017"))
         self.__client = pymongo.MongoClient(host=host,
                                     port=port)
-        self.__db = self.__client.news_storage
+        database = database or os.environ.get("REPOSITORY_DB", "news_storage")
+        self.__db = self.__client.get_database(name=database)
         self.__collection = self.__db.news
         # creating unique index for url field to avoid duplicate news
         self.__collection.create_index('url', unique=True)
         self.__sort_order = ['asc', 'desc']
         self.__sort_keys = ['title', 'url', 'created']
+        self.__logger = LoggerFactory.create_logger(self.__class__.__name__)
+        self.__logger.info("Repository initiated on {0}:{1}".format(host, port))
 
     def add(self, item: dict):
         try:
             self.__collection.insert_one(item)
         except pymongo.errors.DuplicateKeyError:
-            # TODO: add logger
-            # print("Failed to add duplicate key")
+            self.__logger.error("Can't add duplicate item to collection.")
             raise
 
-    def add_many(self, items):
+    def add_many(self, items: []):
         # Inserting one-by-one for handling duplicate news
         add_cntr = 0
         for item in items:
@@ -64,5 +67,9 @@ class Repository:
                 })
             return output
         except:
-            print(traceback.format_exc())
+            self.__logger.error(traceback.format_exc())
             raise
+
+    def clean_db(self):
+        self.__logger.warning("Dropping collection {0}".format(self.__collection.name))
+        self.__collection.drop()
