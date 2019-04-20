@@ -1,15 +1,16 @@
 version: '3'
 
 services:
-  # hackernews-parser:
-  #   image: xandrcorr/hackernews-parser:latest
-  #   environment:
-  #     - REPOSITORY_HOST=mongo-repository
-  #     - REPOSITORY_DB=news_storage
-  #   ports:
-  #     - 8080:8080
-  #   depends_on:
-  #     - mongo-repository
+  hackernews-parser:
+    image: xandrcorr/hackernews-parser:latest
+    environment:
+      - REPOSITORY_HOST=mongo-repository
+      - REPOSITORY_DB=news_storage
+      - HTTP_SERVER_PORT=8080
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo-repository
 
   mongo-repository:
     image: "mongo:3"
