@@ -30,7 +30,7 @@ class Repository:
             self.__logger.error("Can't add duplicate item to collection.")
             raise
 
-    def add_many(self, items: []):
+    def add_many(self, items: [dict]):
         # Inserting one-by-one for handling duplicate news
         add_cntr = 0
         for item in items:
@@ -41,21 +41,24 @@ class Repository:
                 continue
         return add_cntr
 
-    def get(self, limit=5, offset=0, sort_key="created", sort_order="desc") -> []:
+    def get(self, limit: int = 5,
+            offset: int = 0, 
+            sort_key: str = "created", 
+            sort_order: str = "desc") -> []:
         # TODO: write more tests for this method
         try:
             stats = self.__db.command('collstats', 'news')
             if limit < 1 or limit > stats['count']:
                 # TODO: raise proper exception for limit
-                raise BadArgumentError
+                raise BadArgumentError("Limit argument is too big or too low.")
             if offset < 0 or offset + limit > stats['count']:
                 # TODO: raise proper exception for offset
-                raise BadArgumentError
+                raise BadArgumentError("Offset argument is too big or too low.")
             if sort_order in self.__sort_order and sort_key in self.__sort_keys:
                 sort=[(sort_key, pymongo.DESCENDING if sort_order=="desc" else pymongo.ASCENDING)]
             else:
                 # TODO: raise proper exception for sort
-                raise BadArgumentError
+                raise BadArgumentError("Invalid order argument.")
             output = []
             cursor = self.__collection.find(skip=offset, limit=limit, sort=sort)
             for item in cursor:
