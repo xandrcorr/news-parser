@@ -71,7 +71,7 @@ async def fetch(session, url):
     async with session.get(url) as response:
         return await response.text()
 
-async def main():
+async def request_news():
     while True:
         try:
             common_logger.info("Trying to get new posts from https://news.ycombinator.com/news")
@@ -87,11 +87,19 @@ async def main():
             await asyncio.sleep(UPDATE_TIMEOUT)
 
 
+async def start_background_requests(app):
+    app['news_requester'] = app.loop.create_task(request_news())
+
+async def cleanup_background_requests(app):
+    app['news_requester'].cancel()
+    await app['news_requester']
+
 if __name__ == "__main__":
-    app = web.Application()
-    app.add_routes(routes)
-    loop = asyncio.get_event_loop()
-    tasks = [loop.create_task(main()), loop.create_task(web.run_app(app=app, port=SERVER_PORT))]
-    wait_tasks = asyncio.wait(tasks)
-    loop.run_until_complete(wait_tasks)
-    loop.close()
+    try:
+        app = web.Application()
+        app.on_startup.append(start_background_requests)
+        app.on_cleanup.append(cleanup_background_requests)
+        app.add_routes(routes)
+        web.run_app(app=app, port=SERVER_PORT)
+    except:
+        common_logger.error(traceback.format_exc())
